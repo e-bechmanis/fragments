@@ -11,5 +11,8 @@
     "url": "git+https://github.com/e-bechmanis/fragments.git"
   },
   "author": "Elena Bechmanis",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "prettier": "2.8.2"
+  }
 }
