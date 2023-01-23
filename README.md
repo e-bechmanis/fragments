@@ -1,10 +1,8 @@
-# Fragments
-
-## CCP555 fragments back-end API"
+# CCP555 fragments back-end API
 
 ### Local Development
 
-Install npm packages in root directory - npm install
+Install npm packages in root directory - ```npm install```
 
 `npm run lint` <-- run to check if there are any errors to be fixed (will check for code consistency and potential bugs)
 
