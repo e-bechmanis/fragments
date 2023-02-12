@@ -16,7 +16,24 @@ const {
 
 class Fragment {
   constructor({ id, ownerId, created, updated, type, size = 0 }) {
-    // TODO
+    // Throw if no owner ID or no fragment type was found at object creation
+    if (!ownerId || !type) {
+      throw new Error('Owner ID and type are required to create a fragment');
+    }
+    const regex = new RegExp('^text/*');
+    if (!regex.test(type)) {
+      throw new Error(`${type} is not supported`);
+    }
+    if (typeof size != 'number' || size < 0) {
+      throw new Error('Size must be a positive number');
+    }
+
+    this.id = id || randomUUID();
+    this.ownerId = ownerId;
+    this.type = type;
+    this.created = created || new Date();
+    this.updated = updated || new Date();
+    this.size = size || 0;
   }
 
   /**
@@ -26,7 +43,8 @@ class Fragment {
    * @returns Promise<Array<Fragment>>
    */
   static async byUser(ownerId, expand = false) {
-    // TODO
+    const allFragments = await listFragments(ownerId, expand);
+    return Promise.resolve(allFragments);
   }
 
   /**
@@ -36,7 +54,11 @@ class Fragment {
    * @returns Promise<Fragment>
    */
   static async byId(ownerId, id) {
-    // TODO
+    const fragment = await readFragment(ownerId, id);
+    if (!fragment) {
+      throw new Error(`Could not locate a fragment with id: ${id}`);
+    }
+    return Promise.resolve(fragment);
   }
 
   /**
@@ -45,24 +67,25 @@ class Fragment {
    * @param {string} id fragment's id
    * @returns Promise<void>
    */
-  static delete(ownerId, id) {
-    // TODO
+  static async delete(ownerId, id) {
+    return deleteFragment(ownerId, id);
   }
 
   /**
    * Saves the current fragment to the database
    * @returns Promise<void>
    */
-  save() {
-    // TODO
+  async save() {
+    this.updated = new Date();
+    return writeFragment(this);
   }
 
   /**
    * Gets the fragment's data from the database
    * @returns Promise<Buffer>
    */
-  getData() {
-    // TODO
+  async getData() {
+    return readFragmentData(this.ownerId, this.id);
   }
 
   /**
@@ -71,7 +94,9 @@ class Fragment {
    * @returns Promise<void>
    */
   async setData(data) {
-    // TODO
+    this.updated = new Date();
+    this.size = Buffer.byteLength(data);
+    return writeFragmentData(this.ownerId, this.id, data);
   }
 
   /**
@@ -89,7 +114,8 @@ class Fragment {
    * @returns {boolean} true if fragment's type is text/*
    */
   get isText() {
-    // TODO
+    const regex = new RegExp('^text/*');
+    return regex.test(this.type);
   }
 
   /**
@@ -97,7 +123,8 @@ class Fragment {
    * @returns {Array<string>} list of supported mime types
    */
   get formats() {
-    // TODO
+    const formats = ['text/plain'];
+    return formats;
   }
 
   /**
@@ -106,7 +133,9 @@ class Fragment {
    * @returns {boolean} true if we support this Content-Type (i.e., type/subtype)
    */
   static isSupportedType(value) {
-    // TODO
+    // get mimeType, then check if it is in formats
+    const regex = new RegExp('^text/*');
+    return regex.test(value);
   }
 }
 
