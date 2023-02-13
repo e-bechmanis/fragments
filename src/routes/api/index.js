@@ -33,4 +33,6 @@ const rawBody = () =>
 // POST /v1/fragments
 router.post('/fragments', rawBody(), require('./post'));
 
+router.get('/fragments/:id', require('./getById'));
+
 module.exports = router;
