@@ -31,8 +31,8 @@ class Fragment {
     this.id = id || randomUUID();
     this.ownerId = ownerId;
     this.type = type;
-    this.created = created || new Date();
-    this.updated = updated || new Date();
+    this.created = created || new Date().toString();
+    this.updated = updated || new Date().toString();
     this.size = size || 0;
   }
 
@@ -76,7 +76,7 @@ class Fragment {
    * @returns Promise<void>
    */
   async save() {
-    this.updated = new Date();
+    this.updated = new Date().toString();
     return writeFragment(this);
   }
 
@@ -94,7 +94,7 @@ class Fragment {
    * @returns Promise<void>
    */
   async setData(data) {
-    this.updated = new Date();
+    this.updated = new Date().toString();
     this.size = Buffer.byteLength(data);
     return writeFragmentData(this.ownerId, this.id, data);
   }
