@@ -17,11 +17,11 @@ module.exports = async (req, res) => {
 
   if (!Buffer.isBuffer(fragmentData)) {
     logger.warn(`Cannot parse fragment data for user ${req.user}`);
-    throw new Error('Cannot parse fragment data');
+    //res.status(415).json(createErrorResponse(415, 'Cannot parse fragment data'));
   }
   if (!Fragment.isSupportedType(type)) {
     logger.warn(`Unsupported type ${type} passed in POST v1/fragments`);
-    res.status(415).json(createErrorResponse(415, `Unsupported type ${type} `));
+    return res.status(415).json(createErrorResponse(415, `Unsupported type ${type} `));
   }
 
   try {
@@ -35,7 +35,7 @@ module.exports = async (req, res) => {
 
     const location = process.env.API_URL
       ? new URL(`${process.env.API_URL}/v1/fragments/${fragment.id}`)
-      : new URL(`${req.headers.host}/v1/fragments/${fragment.id}`);
+      : new URL(`http://localhost:8080/v1/fragments/${fragment.id}`);
 
     logger.debug('Location: ' + location);
 
