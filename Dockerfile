@@ -28,6 +28,9 @@ WORKDIR /app
 # Copy the package.json and package-lock.json files into the working dir (/app)
 COPY package*.json ./
 
+# Copy our HTPASSWD file
+COPY ./tests/.htpasswd ./tests/.htpasswd
+
 # Install node dependencies defined in package-lock.json
 RUN npm install
 
