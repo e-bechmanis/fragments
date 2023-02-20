@@ -1,7 +1,7 @@
 // src/routes/api/getById.js
 
 const { Fragment } = require('../../model/fragment');
-const { createErrorResponse } = require('../../response');
+const { createSuccessResponse, createErrorResponse } = require('../../response');
 const logger = require('../../logger');
 /**
  * Gets an authenticated user's fragment data (i.e., raw binary data) with the given id
@@ -14,11 +14,13 @@ module.exports = async (req, res) => {
     const fragmentData = await fragment.getData();
     const fragmentType = fragment.type;
 
-    res.set('Content-Type', fragmentType);
     logger.info('Fragment is successfully read');
-    res.status(200).send(fragmentData);
+    return res
+      .set('Content-Type', fragmentType) // set Content-Type in header
+      .status(200)
+      .json(createSuccessResponse({ fragment: fragmentData }));
   } catch (err) {
     logger.error(err);
-    res.status(404).json(createErrorResponse(404, err));
+    return res.status(404).json(createErrorResponse(404, err));
   }
 };
