@@ -21,13 +21,16 @@ class Fragment {
       throw new Error('Owner ID and type are required to create a fragment');
     }
     const regex = new RegExp('^text/*');
+    // Because the service only currently supports text, throw an error if any other type is being passed
     if (!regex.test(type)) {
       throw new Error(`${type} is not supported`);
     }
+    // Account for invalid size variable
     if (typeof size != 'number' || size < 0) {
       throw new Error('Size must be a positive number');
     }
 
+    // generate random id for a newly created fragment
     this.id = id || randomUUID();
     this.ownerId = ownerId;
     this.type = type;
@@ -76,6 +79,7 @@ class Fragment {
    * @returns Promise<void>
    */
   async save() {
+    // update the date of the latest update of a fragment
     this.updated = new Date().toString();
     return writeFragment(this);
   }
@@ -114,6 +118,7 @@ class Fragment {
    * @returns {boolean} true if fragment's type is text/*
    */
   get isText() {
+    // check fragment's type against regular expression
     const regex = new RegExp('^text/*');
     return regex.test(this.type);
   }
@@ -133,7 +138,7 @@ class Fragment {
    * @returns {boolean} true if we support this Content-Type (i.e., type/subtype)
    */
   static isSupportedType(value) {
-    // get mimeType, then check if it is in formats
+    // check the type against regular expression
     const regex = new RegExp('^text/*');
     return regex.test(value);
   }
