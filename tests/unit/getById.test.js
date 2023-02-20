@@ -14,6 +14,23 @@ describe('GET /v1/fragments/:id', () => {
   test('unauthenticated requests are denied', () =>
     request(app).get('/v1/fragments/4dcc65b6-9d57-453a-bd3a-63c107a51698').expect(401));
 
+  // Make sure that appropriate response header returns Content-Type and Content-Length
+  test('Response header contains Content-Type and Content-Length properties', async () => {
+    const data = Buffer.from('hello');
+    const dataSize = Buffer.byteLength(data);
+
+    const postReq = await request(app)
+      .post('/v1/fragments')
+      .auth('user1@email.com', 'password1')
+      .set('Content-Type', 'text/plain')
+      .send(data);
+    const fragmentUrl = `/v1/fragments/${postReq.body.fragment.id}`;
+
+    const res = await request(app).get(fragmentUrl).auth('user1@email.com', 'password1');
+    expect(res.header['content-type']).toBe('text/plain');
+    expect(res.header['content-length']).toEqual(dataSize);
+  });
+
   test('return fragment by id', async () => {
     const data = Buffer.from('hello');
     const postReq = await request(app)
