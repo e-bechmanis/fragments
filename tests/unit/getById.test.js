@@ -27,8 +27,8 @@ describe('GET /v1/fragments/:id', () => {
     const fragmentUrl = `/v1/fragments/${postReq.body.fragment.id}`;
 
     const res = await request(app).get(fragmentUrl).auth('user1@email.com', 'password1');
-    expect(res.header['content-type']).toBe('text/plain');
-    expect(res.header['content-length']).toEqual(dataSize);
+    expect(res.header['content-type']).toBe('text/plain; charset=utf-8');
+    expect(res.header['content-length']).toEqual(dataSize.toString());
   });
 
   test('return fragment by id', async () => {
