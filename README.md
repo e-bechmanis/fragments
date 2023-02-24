@@ -2,7 +2,7 @@
 
 Fragments microservice is a cloud-based microservice that is being developed to work with different fragments of user data. It has functionality to add, retrieve and update the fragments for authenticated users. 
 
-Fragments have two parts: 1) metadata (i.e., details _about_ the fragment); and 2) data (i.e., the actual binary contents of the fragment).
+Fragments have two parts: 1) metadata (details _about_ the fragment); and 2) data (the actual binary contents of the fragment).
 
 The fragment's **metadata** is an object that describes the fragment in the following format:
 
