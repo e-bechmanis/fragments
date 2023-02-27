@@ -29,7 +29,7 @@ WORKDIR /app
 # COPY <src> <dest> copies from the build context (<src>) to a path inside the image
 # Copy the package.json and package-lock.json files into the working dir (/app)
 # Change ownership to user:group (node:node)
-COPY --chown=node:node package*.json /app/
+COPY --chown=node:node package*.json ./
 
 # Install node dependencies defined in package-lock.json
 # Replaced --> RUN npm install
@@ -44,7 +44,7 @@ FROM node:18.14.2-alpine3.17@sha256:0d2712ac2b2c1149391173de670406f6e3dbdb1b2ba4
 WORKDIR /app
 
 # Copy cached node modules from previous stage so we don't have to download them again
-COPY --chown=node:node --from=dependencies /app/ .
+COPY --chown=node:node --from=dependencies /app/node_modules ./node_modules
 
 # Copy src to /app/src/
 COPY --chown=node:node ./src ./src
@@ -56,7 +56,7 @@ COPY --chown=node:node ./tests/.htpasswd ./tests/.htpasswd
 USER node
 
 # Start the container by running our server
-CMD ["node", "server.js"]
+CMD ["node", "./src/index.js"]
 
 # We run our service on port 8080
 EXPOSE 8080
