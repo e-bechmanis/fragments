@@ -28,7 +28,7 @@ WORKDIR /app
 
 # COPY <src> <dest> copies from the build context (<src>) to a path inside the image
 # Copy the package.json and package-lock.json files into the working dir (/app)
-# hange ownership to user:group (node:node)
+# Change ownership to user:group (node:node)
 COPY --chown=node:node package*.json /app/
 
 # Install node dependencies defined in package-lock.json
