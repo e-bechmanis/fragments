@@ -44,7 +44,7 @@ FROM node:18.14.2-alpine3.17@sha256:0d2712ac2b2c1149391173de670406f6e3dbdb1b2ba4
 WORKDIR /app
 
 # Copy cached node modules from previous stage so we don't have to download them again
-COPY --chown=node:node --from=dependencies /app/node_modules ./node_modules
+COPY --chown=node:node --from=dependencies /app /app
 
 # Copy src to /app/src/
 COPY --chown=node:node ./src ./src
