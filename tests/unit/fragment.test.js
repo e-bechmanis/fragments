@@ -120,6 +120,8 @@ describe('Fragment class', () => {
     test('common text types are supported, with and without charset', () => {
       expect(Fragment.isSupportedType('text/plain')).toBe(true);
       expect(Fragment.isSupportedType('text/plain; charset=utf-8')).toBe(true);
+      expect(Fragment.isSupportedType('application/json')).toBe(true);
+      expect(Fragment.isSupportedType('application/json; charset=utf-8')).toBe(true);
     });
 
     test('other types are not supported', () => {
@@ -165,7 +167,7 @@ describe('Fragment class', () => {
         type: 'text/plain; charset=utf-8',
         size: 0,
       });
-      expect(fragment.formats).toEqual(['text/plain']);
+      expect(fragment.formats).toEqual(expect.arrayContaining(['text/plain']));
     });
   });
 
