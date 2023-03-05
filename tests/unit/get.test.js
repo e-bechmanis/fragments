@@ -20,5 +20,40 @@ describe('GET /v1/fragments', () => {
     expect(Array.isArray(res.body.fragments)).toBe(true);
   });
 
-  // TODO: we'll need to add tests to check the contents of the fragments array later
+  // If user doesn't have any fragments, the returned array will be empty
+  test('for users without fragments empty array is returned', async () => {
+    const res = await request(app).get('/v1/fragments').auth('user1@email.com', 'password1');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.fragments).toHaveLength(0);
+  });
+
+  // If user has fragments, the returned array length will be equal to the number of fragments user has
+  test('for users with saved fragments, fragments length matches the amount of fragments', async () => {
+    const fragments = ['Hello', 'World'];
+    for (const fragment in fragments) {
+      await request(app)
+        .post('/v1/fragments')
+        .set('Content-Type', 'text/plain')
+        .send(fragment)
+        .auth('user1@email.com', 'password1');
+    }
+    const res = await request(app).get('/v1/fragments').auth('user1@email.com', 'password1');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.fragments).toHaveLength(2);
+  });
+
+  // Ensure that we are receiving just ids and nothing else
+  test('GET request without expand option will only return ids', async () => {
+    const data = Buffer.from('hello');
+    await request(app)
+      .post('/v1/fragments')
+      .set('Content-Type', 'text/plain')
+      .send(data)
+      .auth('user1@email.com', 'password1');
+    const res = await request(app).get('/v1/fragments').auth('user1@email.com', 'password1');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.fragments[0]).toMatch(
+      /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/
+    );
+  });
 });
