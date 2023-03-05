@@ -67,6 +67,7 @@ describe('POST /v1/fragments', () => {
   // Fragment metadata must have pre-determined list of properties
   test('created fragment metadata has all expected properties', async () => {
     const data = Buffer.from('hello');
+    const size = Buffer.byteLength(data);
     const res = await request(app)
       .post('/v1/fragments')
       .set('Content-Type', 'text/plain')
@@ -78,7 +79,9 @@ describe('POST /v1/fragments', () => {
     expect(res.body.fragment).toHaveProperty('updated');
     expect(res.body.fragment).toHaveProperty('ownerId');
     expect(res.body.fragment).toHaveProperty('type');
+    expect(res.body.fragment.type).toBe('text/plain');
     expect(res.body.fragment).toHaveProperty('size');
+    expect(res.body.fragment.size).toEqual(size);
   });
 
   // Fragment size matches the size of the buffer

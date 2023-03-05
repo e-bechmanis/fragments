@@ -20,9 +20,8 @@ class Fragment {
     if (!ownerId || !type) {
       throw new Error('Owner ID and type are required to create a fragment');
     }
-    const regex = new RegExp('^text/*');
-    // Because the service only currently supports text, throw an error if any other type is being passed
-    if (!regex.test(type)) {
+    // Throw an error if any other type is being passed
+    if (!Fragment.isSupportedType(type)) {
       throw new Error(`${type} is not supported`);
     }
     // Account for invalid size variable
@@ -34,8 +33,8 @@ class Fragment {
     this.id = id || randomUUID();
     this.ownerId = ownerId;
     this.type = type;
-    this.created = created || new Date().toString();
-    this.updated = updated || new Date().toString();
+    this.created = created || new Date().toISOString();
+    this.updated = updated || new Date().toISOString();
     this.size = size || 0;
   }
 
@@ -46,8 +45,7 @@ class Fragment {
    * @returns Promise<Array<Fragment>>
    */
   static async byUser(ownerId, expand = false) {
-    const allFragments = await listFragments(ownerId, expand);
-    return Promise.resolve(allFragments);
+    return listFragments(ownerId, expand);
   }
 
   /**
@@ -80,7 +78,7 @@ class Fragment {
    */
   async save() {
     // update the date of the latest update of a fragment
-    this.updated = new Date().toString();
+    this.updated = new Date().toISOString();
     return writeFragment(this);
   }
 
@@ -98,8 +96,9 @@ class Fragment {
    * @returns Promise<void>
    */
   async setData(data) {
-    this.updated = new Date().toString();
+    this.updated = new Date().toISOString();
     this.size = Buffer.byteLength(data);
+    this.save(); // saving updated metadata, so that db gets updated
     return writeFragmentData(this.ownerId, this.id, data);
   }
 

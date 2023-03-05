@@ -11,7 +11,7 @@ const contentType = require('content-type');
  * and sets the Content-Type header to the desired type of the fragment if the type is supported.
  */
 module.exports = async (req, res) => {
-  logger.info('Trying to add a new fragment // POST v1/fragments');
+  logger.debug('Trying to add a new fragment // POST v1/fragments');
   const { type } = contentType.parse(req);
   const fragmentData = req.body;
 
@@ -29,8 +29,7 @@ module.exports = async (req, res) => {
   try {
     // create a new fragment
     const fragment = new Fragment({ ownerId: req.user, type: type });
-    logger.info(`Created a new fragment`);
-    logger.info(fragment);
+    logger.info({ fragment }, 'Created new fragment');
     // save created fragment
     await fragment.save();
     // write fragment data
@@ -42,14 +41,14 @@ module.exports = async (req, res) => {
       ? new URL(`${process.env.API_URL}/v1/fragments/${fragment.id}`)
       : new URL(`http://localhost:8080/v1/fragments/${fragment.id}`);
 
-    logger.debug('Location: ' + location);
+    logger.debug('Location: ' + location.href);
 
     res
-      .location(location) // Set fragment location in response header
+      .location(location.href) // Set fragment location in response header
       .status(201)
       .json(createSuccessResponse({ fragment: fragment }));
   } catch (err) {
     logger.error(err);
-    res.status(415).json(createErrorResponse(415, err));
+    res.status(503).json(createErrorResponse(503, err));
   }
 };
