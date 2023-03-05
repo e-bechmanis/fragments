@@ -127,7 +127,7 @@ class Fragment {
    * @returns {Array<string>} list of supported mime types
    */
   get formats() {
-    const formats = ['text/plain'];
+    const formats = ['text/plain', 'application/json'];
     return formats;
   }
 
@@ -138,7 +138,7 @@ class Fragment {
    */
   static isSupportedType(value) {
     // check the type against regular expression
-    const regex = new RegExp('^text/*');
+    const regex = new RegExp('^(text/*|application/json)');
     return regex.test(value);
   }
 }
