@@ -11,15 +11,15 @@ module.exports = async (req, res) => {
   let fragments = [];
   // If there is a query in the get request, making sure to pass expand parameter as true
   // This way it will return metadata for each fragment
-  if (req.query) {
+  if (req.query.expand) {
     fragments = await Fragment.byUser(req.user, true);
-    logger.info('Requested detailed fragments list');
-    logger.debug(fragments);
+    logger.info(`User ${req.user} requested detailed fragments list`);
+    logger.debug({ fragments });
   } else {
     // Otherwise returning a list of fragments ids
     fragments = await Fragment.byUser(req.user);
-    logger.info('Requested list of fragment ids');
-    logger.debug(fragments);
+    logger.info(`User ${req.user} requested list of fragments ids`);
+    logger.debug({ fragments });
   }
   res.status(200).json(createSuccessResponse({ fragments: fragments }));
 };
