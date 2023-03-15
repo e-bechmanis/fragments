@@ -11,9 +11,6 @@ const router = express.Router();
 const contentType = require('content-type');
 const { Fragment } = require('../../model/fragment');
 
-// GET /v1/fragments
-router.get('/fragments', require('./get'));
-
 // Support sending various Content-Types on the body up to 5M in size
 const rawBody = () =>
   express.raw({
@@ -33,6 +30,9 @@ const rawBody = () =>
 // POST /v1/fragments
 router.post('/fragments', rawBody(), require('./post'));
 
+// GET routes
+router.get('/fragments', require('./get'));
 router.get('/fragments/:id', require('./getById'));
+router.get('/fragments/:id/info', require('./getByIdInfo'));
 
 module.exports = router;
