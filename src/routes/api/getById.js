@@ -35,7 +35,8 @@ module.exports = async (req, res) => {
       );
       // If conversion is allowed
       if (fragment.isValidConversion(ext)) {
-        logger.debug('Conversion is allowed');
+        logger.debug('Conversion is allowed. Initiating conversion process');
+        fragmentData = fragment.convertFragmentData(ext);
       }
     }
 
