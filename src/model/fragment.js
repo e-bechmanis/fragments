@@ -3,6 +3,10 @@
 const { randomUUID } = require('crypto');
 // Use https://www.npmjs.com/package/content-type to create/parse Content-Type headers
 const contentType = require('content-type');
+// Use https://github.com/markdown-it/markdown-it to help with text conversions to markdown
+const MarkdownIt = require('markdown-it');
+
+const md = new MarkdownIt();
 
 // Functions for working with fragment metadata/data using our DB
 const {
@@ -163,6 +167,21 @@ class Fragment {
     const extensions = CONVERSIONS[type];
     return extensions.includes(ext);
   }
+
+  /**
+   * Returns fragment data after it has been converted into suggested extension
+   * @param {string} ext an extension
+   * @returns converted data
+   */
+  async convertFragmentData(ext) {
+    let convertedData;
+    if (ext === 'html') {
+      const data = await this.getData();
+      convertedData = md.render(data.toString());
+    }
+    return convertedData;
+  }
 }
 
 module.exports.Fragment = Fragment;
+module.exports.CONVERSIONS = CONVERSIONS;
