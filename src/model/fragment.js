@@ -14,6 +14,15 @@ const {
   deleteFragment,
 } = require('./data');
 
+// Dictionary of conversions
+const CONVERSIONS = {
+  'text/plain': ['txt'],
+  'text/markdown': ['md', 'html', 'txt'],
+  'text/html': ['html', 'txt'],
+  'application/json': ['json', 'txt'],
+  'image/*': ['png', 'jpg', 'webp', 'gif'],
+};
+
 class Fragment {
   constructor({ id, ownerId, created, updated, type, size = 0 }) {
     // Throw if no owner ID or no fragment type was found at object creation
@@ -140,6 +149,19 @@ class Fragment {
     // check the type against regular expression
     const regex = new RegExp('^(text/*|application/json/*)');
     return regex.test(value);
+  }
+
+  /**
+   * Returns true if we know that current fragment data can be converted into suggested extension
+   * @param {string} ext an extension
+   * @returns {boolean} true if we conversion can be done
+   */
+  static isValidConversion(ext) {
+    // get the type of current fragment
+    const { type } = contentType.parse(this.type);
+    // get a list of allowed extensions for the fragment
+    const extensions = CONVERSIONS[type];
+    return extensions.includes(ext);
   }
 }
 
