@@ -3,6 +3,7 @@
 const { Fragment } = require('../../model/fragment');
 const { createErrorResponse } = require('../../response');
 const logger = require('../../logger');
+const mime = require('mime');
 /**
  * Gets an authenticated user's fragment data (i.e., raw binary data) with the given id
  */
@@ -18,9 +19,9 @@ module.exports = async (req, res) => {
     const fragment = await Fragment.byId(req.user, id);
     logger.debug({ fragment }, `Read fragment metadata for user ${req.user}`);
     // Getting fragment data
-    const fragmentData = await fragment.getData();
-    const fragmentType = fragment.type;
-    const fragmentDataSize = fragment.size;
+    let fragmentData = await fragment.getData();
+    let fragmentType = fragment.type;
+    let fragmentDataSize = fragment.size;
 
     logger.info('Fragment data is successfully read');
     logger.debug(`Fragment type ` + fragmentType);
@@ -37,6 +38,8 @@ module.exports = async (req, res) => {
       if (fragment.isValidConversion(ext)) {
         logger.debug('Conversion is allowed. Initiating conversion process');
         fragmentData = fragment.convertFragmentData(ext);
+        fragmentType = mime.getType(ext);
+        logger.debug(`Converted to ${ext}, returning fragment type ${fragmentType}`);
       }
     }
 
