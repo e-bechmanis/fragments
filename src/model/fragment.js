@@ -160,10 +160,8 @@ class Fragment {
    * @param {string} ext an extension
    * @returns {boolean} true if we conversion can be done
    */
-  static isValidConversion(ext) {
-    // get the type of current fragment
-    const { type } = contentType.parse(this.type);
-    // get a list of allowed extensions for the fragment
+  static isValidConversion(type, ext) {
+    // get a list of allowed extensions for the fragment type
     const extensions = CONVERSIONS[type];
     return extensions.includes(ext);
   }
