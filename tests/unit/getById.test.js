@@ -52,4 +52,33 @@ describe('GET /v1/fragments/:id', () => {
     expect(res.statusCode).toBe(404);
     expect(res.body.status).toBe('error');
   });
+
+  test('invalid conversion type is rejected', async () => {
+    const data = Buffer.from('hello');
+    const postReq = await request(app)
+      .post('/v1/fragments')
+      .auth('user1@email.com', 'password1')
+      .set('Content-Type', 'text/plain')
+      .send(data);
+
+    const fragmentUrl = `/v1/fragments/${postReq.body.fragment.id}.jpeg`;
+    const res = await request(app).get(fragmentUrl).auth('user1@email.com', 'password1');
+    expect(res.statusCode).toBe(415);
+  });
+
+  test('markdown type fragment can be converted to HTML', async () => {
+    const data = '# Header';
+    const postReq = await request(app)
+      .post('/v1/fragments')
+      .auth('user1@email.com', 'password1')
+      .set('Content-Type', 'text/markdown')
+      .send(data);
+
+    const res = await request(app)
+      .get('/v1/fragments/' + postReq.body.fragment.id + '.html')
+      .auth('user1@email.com', 'password1');
+    expect(res.statusCode).toBe(200);
+    expect(res.text).toEqual('<h1>Header</h1>\n');
+    expect(res.headers['content-type']).toMatch(/html/);
+  });
 });
