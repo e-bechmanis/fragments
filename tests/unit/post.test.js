@@ -57,7 +57,7 @@ describe('POST /v1/fragments', () => {
     const data = Buffer.from('hello');
     const res = await request(app)
       .post('/v1/fragments')
-      .set('Content-Type', 'image/jpg')
+      .set('Content-Type', 'video/avi')
       .send(data)
       .auth('user1@email.com', 'password1');
     expect(res.statusCode).toBe(415);
@@ -126,5 +126,31 @@ describe('POST /v1/fragments', () => {
     expect(typeof res.body.fragment.size).toBe('number');
     expect(Date.parse(res.body.fragment.created)).not.toBeNaN();
     expect(Date.parse(res.body.fragment.updated)).not.toBeNaN();
+  });
+
+  test('attempt to create a fragment without data gets rejected', async () => {
+    const res = await request(app).post('/v1/fragments').auth('user1@email.com', 'password1');
+    expect(res.status).toBe(500);
+  });
+
+  test("authorized users can create 'application/json' fragment", async () => {
+    const data = {
+      'text/plain': ['txt'],
+      'text/markdown': ['md', 'html', 'txt'],
+      'text/html': ['html', 'txt'],
+      'application/json': ['json', 'txt'],
+      'image/*': ['png', 'jpg', 'webp', 'gif'],
+    };
+    const res = await request(app)
+      .post('/v1/fragments')
+      .set('Content-Type', 'application/json')
+      .send(data)
+      .auth('user1@email.com', 'password1');
+
+    expect(res.statusCode).toBe(201);
+    expect(res.body.status).toBe('ok');
+    // Check if fragment exists in the In-Memory Database
+    const fragment = await Fragment.byId(res.body.fragment.ownerId, res.body.fragment.id);
+    expect(res.body.fragment).toEqual(fragment);
   });
 });
