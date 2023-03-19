@@ -35,11 +35,16 @@ module.exports = async (req, res) => {
         `User ${req.user} requested conversion of fragment from ${fragmentType} to ${ext}`
       );
       // If conversion is allowed
-      if (fragment.isValidConversion(ext)) {
+      if (Fragment.isValidConversion(fragmentType, ext)) {
         logger.debug('Conversion is allowed. Initiating conversion process');
-        fragmentData = fragment.convertFragmentData(ext);
+        fragmentData = await fragment.convertFragmentData(ext);
+        logger.debug(fragmentData);
         fragmentType = mime.getType(ext);
         logger.debug(`Converted to ${ext}, returning fragment type ${fragmentType}`);
+      } else {
+        const err = `${ext} is not a valid extension for a fragment with type ${fragmentType}`;
+        logger.error(err);
+        return res.status(415).json(createErrorResponse(415, err));
       }
     }
 
