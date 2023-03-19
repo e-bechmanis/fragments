@@ -49,6 +49,6 @@ module.exports = async (req, res) => {
       .json(createSuccessResponse({ fragment: fragment }));
   } catch (err) {
     logger.error(err);
-    res.status(503).json(createErrorResponse(503, err));
+    res.status(500).json(createErrorResponse(500, err));
   }
 };
