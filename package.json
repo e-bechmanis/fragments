@@ -19,6 +19,7 @@
   "author": "Elena Bechmanis",
   "license": "UNLICENSED",
   "devDependencies": {
+    "@orangeopensource/hurl": "^2.0.1",
     "cross-env": "^7.0.3",
     "eslint": "^8.31.0",
     "jest": "^29.4.0",
