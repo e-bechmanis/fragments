@@ -43,7 +43,7 @@ user1@email.com:password1
 
 HTTP/1.1 200
 [Asserts]
-Content-Type: application/json
 jsonpath "$.key1" == "value1"
 jsonpath "$.key2" == "value2"
 jsonpath "$.key3" == "value3"
+header "Content-Type" startsWith "application/json"
