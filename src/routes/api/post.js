@@ -15,15 +15,16 @@ module.exports = async (req, res) => {
   const { type } = contentType.parse(req);
   const fragmentData = req.body;
 
-  // Check if fragment data is a Buffer type. If it isn't, throw an error
-  if (!Buffer.isBuffer(fragmentData)) {
-    logger.warn(`Cannot parse fragment data for user ${req.user}`);
-    return res.status(415).json(createErrorResponse(415, 'Cannot parse fragment data'));
-  }
   // If the type of a fragment to be created is not currently supported, throw an error
   if (!Fragment.isSupportedType(type)) {
     logger.warn(`Unsupported type ${type} passed in POST v1/fragments`);
     return res.status(415).json(createErrorResponse(415, `Unsupported type ${type} `));
+  }
+
+  // Check if fragment data is a Buffer type. If it isn't, throw an error
+  if (!Buffer.isBuffer(fragmentData)) {
+    logger.warn(`Cannot parse fragment data for user ${req.user}`);
+    return res.status(415).json(createErrorResponse(415, 'Cannot parse fragment data'));
   }
 
   try {
