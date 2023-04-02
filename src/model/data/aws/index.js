@@ -1,12 +1,12 @@
+// src/model/data/aws/index.js
 // XXX: temporary use of memory-db until we add DynamoDB
 const MemoryDB = require('../memory/memory-db');
 
 const s3Client = require('./s3Client');
-const { PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const logger = require('../../../logger');
 
-// Create two in-memory databases: one for fragment metadata and the other for raw data
-const data = new MemoryDB();
+// Create in-memory database for fragment metadata
 const metadata = new MemoryDB();
 
 // Write a fragment's metadata to memory db. Returns a Promise
@@ -103,14 +103,31 @@ async function listFragments(ownerId, expand = false) {
   return fragments.map((fragment) => fragment.id);
 }
 
-// Delete a fragment's metadata and data from memory db. Returns a Promise
-function deleteFragment(ownerId, id) {
-  return Promise.all([
-    // Delete metadata
-    metadata.del(ownerId, id),
-    // Delete data
-    data.del(ownerId, id),
-  ]);
+// Delete a fragment's metadata and data from S3. Returns a Promise
+// https://docs.aws.amazon.com/AmazonS3/latest/userguide/example_s3_DeleteObject_section.html
+async function deleteFragment(ownerId, id) {
+  // Create the DELETE API params from our details
+  const s3Params = {
+    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    // Our key will be a mix of the ownerID and fragment id, written as a path
+    Key: `${ownerId}/${id}`,
+  };
+
+  // Create a DELETE Object command to send to S3
+  const s3Command = new DeleteObjectCommand(s3Params);
+
+  try {
+    // Delete the object from Amazon S3 bucket
+    await s3Client.send(s3Command);
+    logger.info('Fragment data has been successfully deleted.');
+  } catch (err) {
+    const { Bucket, Key } = s3Params;
+    logger.error(
+      { err, Bucket, Key },
+      'There was an error when trying to delete data from Amazon S3'
+    );
+    throw new Error('unable to delete fragment data');
+  }
 }
 
 module.exports.listFragments = listFragments;
