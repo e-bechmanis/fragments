@@ -12,7 +12,6 @@ module.exports = async (req, res) => {
     await Fragment.delete(req.user, req.params.id);
     res.status(200).json(createSuccessResponse());
   } catch (err) {
-    console.log(err);
     if (err.message.startsWith('Could not locate')) {
       logger.warn(`Couldn't find a fragment ${req.params.id}. Aborting delete process`);
       return res
