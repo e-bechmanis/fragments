@@ -151,7 +151,7 @@ class Fragment {
    */
   static isSupportedType(value) {
     // check the type against regular expression
-    const regex = new RegExp('^(text/*|application/json/*)');
+    const regex = new RegExp('^(text/*|application/json/*|image/*)');
     return regex.test(value);
   }
 
