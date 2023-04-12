@@ -28,7 +28,7 @@ module.exports = async (req, res) => {
         .status(400)
         .json(
           createErrorResponse(
-            415,
+            400,
             `Type ${type} is not allowed for this fragment. Fragment's type can not be changed after it is created`
           )
         );
