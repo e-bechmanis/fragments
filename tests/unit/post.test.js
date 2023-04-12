@@ -153,4 +153,19 @@ describe('POST /v1/fragments', () => {
     const fragment = await Fragment.byId(res.body.fragment.ownerId, res.body.fragment.id);
     expect(res.body.fragment).toEqual(fragment);
   });
+
+  test('authorized users can create fragment with content-type - image/*', async () => {
+    const data = Buffer.from('Imagine it is an image');
+    const res = await request(app)
+      .post('/v1/fragments')
+      .set('Content-Type', 'image/jpeg')
+      .send(data)
+      .auth('user1@email.com', 'password1');
+
+    expect(res.statusCode).toBe(201);
+    expect(res.body.status).toBe('ok');
+    // Check if fragment exists in the In-Memory Database
+    const fragment = await Fragment.byId(res.body.fragment.ownerId, res.body.fragment.id);
+    expect(res.body.fragment).toEqual(fragment);
+  });
 });
