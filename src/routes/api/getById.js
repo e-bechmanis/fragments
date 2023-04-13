@@ -4,6 +4,7 @@ const { Fragment } = require('../../model/fragment');
 const { createErrorResponse } = require('../../response');
 const logger = require('../../logger');
 const mime = require('mime');
+const path = require('node:path');
 /**
  * Gets an authenticated user's fragment data (i.e., raw binary data) with the given id
  */
@@ -11,9 +12,9 @@ module.exports = async (req, res) => {
   try {
     logger.info('Trying to get user fragment by id // GET /v1/fragments/:id');
     //Logic to account for GET /fragments/:id.ext
-    //Parse id param to see if there is any extension to convert fragment to
-    const parsedId = req.params.id.split('.');
-    const id = parsedId[0]; // id will always be an element 0
+    const parsedPath = path.parse(req.url);
+    const id = parsedPath.name;
+    const ext = parsedPath.ext;
 
     // Getting fragment metadata
     const fragment = await Fragment.byId(req.user, id);
@@ -29,8 +30,7 @@ module.exports = async (req, res) => {
 
     // When id string actually gets parsed into 2 elements, we should see if the fragment data can be converted
     // into the required datatype
-    if (parsedId.length > 1) {
-      const ext = parsedId[1];
+    if (ext) {
       logger.info(
         `User ${req.user} requested conversion of fragment from ${fragmentType} to ${ext}`
       );
