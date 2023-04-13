@@ -5,10 +5,12 @@ const { randomUUID } = require('crypto');
 const contentType = require('content-type');
 // Use https://github.com/markdown-it/markdown-it to help with text conversions to markdown
 const MarkdownIt = require('markdown-it');
+// Use https://sharp.pixelplumbing.com to help with image conversions
+const sharp = require('sharp');
 
 const md = new MarkdownIt();
 
-// Functions for working with fragment metadata/data using our DB
+// Functions for working with fragment metadata/data using DB
 const {
   readFragment,
   writeFragment,
@@ -20,11 +22,14 @@ const {
 
 // Dictionary of conversions
 const CONVERSIONS = {
-  'text/plain': ['txt'],
-  'text/markdown': ['md', 'html', 'txt'],
-  'text/html': ['html', 'txt'],
-  'application/json': ['json', 'txt'],
-  'image/*': ['png', 'jpg', 'webp', 'gif'],
+  'text/plain': ['.txt'],
+  'text/markdown': ['.md', '.html', '.txt'],
+  'text/html': ['.html', '.txt'],
+  'application/json': ['.json', '.txt'],
+  'image/jpeg': ['.png', '.jpg', '.webp', '.gif'],
+  'image/png': ['.png', '.jpg', '.webp', '.gif'],
+  'image/webp': ['.png', '.jpg', '.webp', '.gif'],
+  'image/gif': ['.png', '.jpg', '.webp', '.gif'],
 };
 
 class Fragment {
@@ -170,12 +175,21 @@ class Fragment {
    * Returns fragment data after it has been converted into suggested extension
    * @param {string} ext an extension
    * @returns converted data
+   * To be used after a call to isValidConversion() because it doesn't check again if the current content-type can be converted
    */
   async convertFragmentData(ext) {
     let convertedData;
-    if (ext === 'html') {
-      const data = await this.getData();
+    const data = await this.getData();
+    if (ext === '.html') {
       convertedData = md.render(data.toString());
+    } else if (ext == '.png') {
+      convertedData = await sharp(data).png().toBuffer();
+    } else if (ext == '.jpeg' || ext == '.jpg') {
+      convertedData = await sharp(data).jpeg().toBuffer();
+    } else if (ext == '.webp') {
+      convertedData = await sharp(data).webp().toBuffer();
+    } else if (ext == '.gif') {
+      convertedData = await sharp(data).gif().toBuffer();
     }
     return convertedData;
   }
