@@ -180,9 +180,7 @@ class Fragment {
   async convertFragmentData(ext) {
     let convertedData;
     const data = await this.getData();
-    if (ext === '.html') {
-      convertedData = md.render(data.toString());
-    } else if (ext == '.png') {
+    if (ext == '.png') {
       convertedData = await sharp(data).png().toBuffer();
     } else if (ext == '.jpeg' || ext == '.jpg') {
       convertedData = await sharp(data).jpeg().toBuffer();
@@ -190,6 +188,12 @@ class Fragment {
       convertedData = await sharp(data).webp().toBuffer();
     } else if (ext == '.gif') {
       convertedData = await sharp(data).gif().toBuffer();
+    } else if (ext === '.html' && this.mimeType == 'text/markdown') {
+      convertedData = md.render(data.toString());
+    } else if (ext === '.json') {
+      convertedData = JSON.stringify(data);
+    } else {
+      convertedData = data.toString();
     }
     return convertedData;
   }
