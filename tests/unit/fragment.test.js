@@ -1,13 +1,14 @@
 const { Fragment } = require('../../src/model/fragment');
+const sharp = require('sharp');
+const MarkdownIt = require('markdown-it');
+const fs = require('fs');
+const path = require('path');
 
 // Wait for a certain number of ms. Returns a Promise.
 const wait = async (ms = 1000) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const validTypes = [
   `text/plain`,
-  /*
-   Currently, only text/plain is supported. Others will be added later.
-
   `text/markdown`,
   `text/html`,
   `application/json`,
@@ -15,7 +16,6 @@ const validTypes = [
   `image/jpeg`,
   `image/webp`,
   `image/gif`,
-  */
 ];
 
 describe('Fragment class', () => {
@@ -253,6 +253,84 @@ describe('Fragment class', () => {
 
       await Fragment.delete('1234', fragment.id);
       expect(() => Fragment.byId('1234', fragment.id)).rejects.toThrow();
+    });
+  });
+
+  describe('Testing convertFragmentData()', () => {
+    describe('Image conversions', () => {
+      const filePath = path.join(__dirname, '/test_image/istockphoto-1201041782-612x612.jpg');
+      const imageBuffer = fs.readFileSync(filePath);
+
+      let fragment;
+
+      beforeEach(async () => {
+        fragment = new Fragment({ ownerId: '1234', type: 'image/jpeg', size: 0 });
+        await fragment.save();
+        await fragment.setData(imageBuffer);
+      });
+
+      test('should convert data to PNG when ext is ".png"', async () => {
+        // Create a spy on the png method
+        const pngSpy = jest.spyOn(sharp.prototype, 'png');
+        const result = await fragment.convertFragmentData('.png');
+        expect(pngSpy).toHaveBeenCalled();
+        expect(result).toEqual(expect.any(Buffer));
+      });
+
+      test('should convert data to JPEG when ext is ".jpeg" or ".jpg"', async () => {
+        const jpegSpy = jest.spyOn(sharp.prototype, 'jpeg');
+        const result1 = await fragment.convertFragmentData('.jpeg');
+        const result2 = await fragment.convertFragmentData('.jpg');
+        expect(jpegSpy).toHaveBeenCalled();
+        expect(result1).toEqual(expect.any(Buffer));
+        expect(result2).toEqual(expect.any(Buffer));
+      });
+
+      test('should convert data to WEBP when ext is ".webp"', async () => {
+        const webpSpy = jest.spyOn(sharp.prototype, 'webp');
+        const result = await fragment.convertFragmentData('.webp');
+        expect(webpSpy).toHaveBeenCalled();
+        expect(result).toEqual(expect.any(Buffer));
+      });
+
+      test('should convert data to GIF when ext is ".gif"', async () => {
+        const gifSpy = jest.spyOn(sharp.prototype, 'gif');
+        const result = await fragment.convertFragmentData('.gif');
+        expect(gifSpy).toHaveBeenCalled();
+        expect(result).toEqual(expect.any(Buffer));
+      });
+    });
+
+    describe('Text/* and JSON conversions', () => {
+      test('should render Markdown to HTML when ext is ".html" and mimeType is "text/markdown"', async () => {
+        const md = new MarkdownIt();
+        const mockRender = jest.fn();
+        md.render = mockRender;
+
+        const fragment = new Fragment({ ownerId: '1234', type: 'text/markdown', size: 0 });
+        await fragment.save();
+        await fragment.setData('# Title');
+        const result = await fragment.convertFragmentData('.html');
+        expect(result).toEqual('<h1>Title</h1>\n');
+      });
+
+      test('should stringify data when ext is ".json"', async () => {
+        const fragment = new Fragment({ ownerId: '1234', type: 'application/json', size: 0 });
+        fragment.getData = jest.fn().mockResolvedValue({ message: 'Hello' });
+
+        const result = await fragment.convertFragmentData('.json');
+
+        expect(result).toEqual('{"message":"Hello"}');
+      });
+
+      test('should convert data to string when converting text/* to .txt', async () => {
+        const fragment = new Fragment({ ownerId: '1234', type: 'text/plain', size: 0 });
+        fragment.getData = jest.fn().mockResolvedValue(Buffer.from('test'));
+
+        const result = await fragment.convertFragmentData('.txt');
+
+        expect(result).toEqual('test');
+      });
     });
   });
 });
