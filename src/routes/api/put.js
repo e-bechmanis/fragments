@@ -19,7 +19,7 @@ module.exports = async (req, res) => {
   try {
     // Getting fragment metadata
     const fragment = await Fragment.byId(req.user, req.params.id);
-    logger.debug({ fragment }, `Read fragment metadata for user ${req.user}`);
+    logger.info({ fragment }, `Read fragment metadata for user ${req.user}`);
     if (fragment.type != type) {
       logger.warn(
         `Content type ${type} passed in PUT v1/fragments/:id doesn't match original content-type`
