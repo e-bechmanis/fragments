@@ -35,4 +35,4 @@ jsonpath "$.fragment.ownerId" matches "^[0-9a-fA-F]+$"
 jsonpath "$.fragment.created" isString
 jsonpath "$.fragment.updated" isString
 jsonpath "$.fragment.type" == "text/plain"
-jsonpath "$.fragment.size" == 1
+jsonpath "$.fragment.size" == 18
