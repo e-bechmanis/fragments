@@ -29,4 +29,4 @@ HTTP/1.1 200
 
 [Asserts]
 header "Content-Type" startsWith "text/plain"
-body == "This is a fragment!"
+body == "This is a fragment"
