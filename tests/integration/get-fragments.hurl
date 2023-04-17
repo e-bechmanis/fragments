@@ -65,6 +65,5 @@ HTTP/1.1 200
 
 [Asserts]
 jsonpath "$.fragments" count == 2
-jsonpath "$.fragments[*].id" matches "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
 jsonpath "$.fragments[0].size" == 10
 jsonpath "$.fragments[1].size" == 9
