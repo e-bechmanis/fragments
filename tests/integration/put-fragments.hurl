@@ -42,4 +42,19 @@ HTTP/1.1 200
 
 [Asserts]
 header "Content-Type" startsWith "text/plain"
-body == "This is an updated fragment"
+body == "This is an updated fragment!"
+
+# 2. Authenticated PUT request to /v1/fragments
+# Sending wrong datatype
+PUT {{url}}
+
+Content-Type: text/markdown
+
+[BasicAuth]
+user1@email.com:password1
+
+# Body of request
+`## Some new fragment`
+# We expect to get back an HTTP 400
+HTTP/1.1 400
+
