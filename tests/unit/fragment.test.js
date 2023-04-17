@@ -258,7 +258,7 @@ describe('Fragment class', () => {
 
   describe('Testing convertFragmentData()', () => {
     describe('Image conversions', () => {
-      const filePath = path.join(__dirname, '/test_image/istockphoto-1201041782-612x612.jpg');
+      const filePath = path.join(__dirname, '../test_image/istockphoto-1201041782-612x612.jpg');
       const imageBuffer = fs.readFileSync(filePath);
 
       let fragment;
