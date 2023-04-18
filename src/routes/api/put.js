@@ -19,7 +19,7 @@ module.exports = async (req, res) => {
   try {
     // Getting fragment metadata
     const fragment = await Fragment.byId(req.user, req.params.id);
-    logger.info({ fragment }, `Read fragment metadata for user ${req.user}`);
+    logger.debug({ fragment }, `Read fragment metadata for user ${req.user}`);
     if (fragment.type != type) {
       logger.warn(
         `Content type ${type} passed in PUT v1/fragments/:id doesn't match original content-type`
@@ -35,10 +35,8 @@ module.exports = async (req, res) => {
     }
     logger.info('Updating fragment data');
     // overwrite fragment data and save updates
-    await fragment.save();
-    logger.info('Saved fragment');
     await fragment.setData(fragmentData);
-    //await fragment.save();
+    await fragment.save();
     res.status(200).json(createSuccessResponse({ fragment: fragment }));
   } catch (err) {
     logger.error(err);
