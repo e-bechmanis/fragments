@@ -77,7 +77,7 @@ class Fragment {
     if (!fragment) {
       throw new Error(`Could not locate a fragment with id: ${id}`);
     }
-    return Promise.resolve(fragment);
+    return new Fragment(fragment);
   }
 
   /**
