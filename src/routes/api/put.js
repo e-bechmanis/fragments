@@ -35,8 +35,9 @@ module.exports = async (req, res) => {
     }
     logger.info('Updating fragment data');
     // overwrite fragment data and save updates
-    await fragment.setData(fragmentData);
     await fragment.save();
+    await fragment.setData(fragmentData);
+    //await fragment.save();
     res.status(200).json(createSuccessResponse({ fragment: fragment }));
   } catch (err) {
     logger.error(err);
